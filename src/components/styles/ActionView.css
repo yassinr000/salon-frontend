@@ -1,0 +1,124 @@
+.modal-overlay2 {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 20, 30, 0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Modal box */
+.action-modal {
+  width: 430px;
+  background: #fff;
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(236, 72, 153, 0.1);
+    position: relative;
+
+}
+@keyframes fadeIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+.close-btn2 {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #555;
+  padding: 25px;
+}
+
+.btn-form{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 50px;
+  padding: 10px;
+}
+.modify-btn{
+  font-size: 20px;
+  margin : 5px;
+  position: relative;
+  display: flex;
+  border: none;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 35px;
+  background: linear-gradient(135deg, #fdfec6, #EEF07A);
+
+  font-family: Arial, Helvetica, sans-serif;
+  color: #1A2A44  ;
+  box-shadow: 0 4px 10px rgba(244, 114, 182, 0.18);
+  font-weight: 600;
+  
+  
+}
+.modify-btn:hover{
+  background: linear-gradient(135deg, #f3f395, #f1f173);
+  transition: all 0.5s ease;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(248, 213, 73, 0.3);
+}
+
+.done-btn{
+  font-size: 20px;
+  margin : 5px;
+  position: relative;
+  display: flex;
+  border: none;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 35px;
+  background-color: #61f061;
+  background: linear-gradient(135deg, #a7f8a7, #51f151);
+  font-family: Arial, Helvetica, sans-serif;
+  color: #1A4A4A  ;
+  box-shadow: 0 4px 10px rgba(244, 114, 182, 0.18);
+  font-weight: 600;
+}
+.done-btn:hover{
+  background: linear-gradient(135deg, #6bed6b, #0ce00c);
+  transition: all 0.5s ease;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(27, 247, 97, 0.3);
+}
+
+.delete-btn{
+  font-size: 20px;
+  margin : 5px;
+  position: relative;
+  display: flex;
+  border: none;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 35px;
+  background: linear-gradient(135deg,#fa8484,#fb5555);
+  font-family: Arial, Helvetica, sans-serif;
+  color: #1A4A4A  ;
+  box-shadow: 0 4px 10px rgba(244, 114, 182, 0.18);
+  font-weight: 600;
+}
+.delete-btn:hover{
+  
+  background: linear-gradient(135deg,#e47373,#e93e3e);
+  transition: all 0.5s ease;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(27, 247, 97, 0.3);
+}

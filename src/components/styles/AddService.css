@@ -1,0 +1,24 @@
+.service-form {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    flex-direction: column;
+}
+.service-form input {
+    padding: 20px;
+    height: 10Px;
+    border-radius: 14px;
+    outline: none;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+}
+.service-form input:focus{
+  border-color: #ec4899;
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.12);
+}
+.service-footer{
+    display: flex;
+    margin-top: 25px;
+    gap: 10px;
+    flex-direction: row;
+    justify-content: flex-end;
+}

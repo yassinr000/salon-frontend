@@ -1,0 +1,96 @@
+import React, { useState, useEffect } from 'react'
+import AddRdv from '../components/AddRdv.jsx'
+import ActionView from '../components/ActionView.jsx'
+import { api } from '../api.js'
+
+const LABELS = { confirme: 'Confirmé', 'en-attente': 'En attente', annule: 'Annulé' }
+
+function Bookings() {
+  const [bookings, setBookings] = useState([])
+  const [search, setSearch] = useState('')
+  const [showAdd, setShowAdd] = useState(false)
+  const [selected, setSelected] = useState(null)
+
+  useEffect(() => {
+    api.get('bookings.php').then((data) =>
+      setBookings(data.map((b) => ({ ...b, label: LABELS[b.statut] })))
+    )
+  }, [])
+
+  const handleAdd = async (newBooking) => {
+    const saved = await api.post('bookings.php', newBooking)
+    setBookings((prev) => [...prev, { ...saved, label: LABELS[saved.statut] }])
+    setShowAdd(false)
+  }
+
+  const handleDelete = async (id) => {
+    await api.delete('bookings.php', id)
+    setBookings((prev) => prev.filter((b) => b.id !== id))
+    setSelected(null)
+  }
+
+  const handleModify = async (modified) => {
+    await api.put('bookings.php', modified.id, modified)
+    const updated = { ...modified, label: LABELS[modified.statut] }
+    setBookings((prev) => prev.map((b) => (b.id === modified.id ? updated : b)))
+    setSelected(updated)
+  }
+
+  const filtered = bookings.filter((b) =>
+    b.patient.toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <>
+      <h1 className="bookings-title">Rendez-vous</h1>
+
+      <div className="rdv-container">
+        <div className="rdv-topbar">
+          <input
+            type="text"
+            placeholder="Chercher un rendez-vous"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button onClick={() => setShowAdd(true)}>Ajouter un nouveau rendez-vous</button>
+        </div>
+
+        <div className="rdv-props">
+          <span>PATIENT</span>
+          <span>SERVICE</span>
+          <span>DATE</span>
+          <span>PRIX</span>
+          <span>STATUT</span>
+          <span>ACTION</span>
+        </div>
+
+        <div className="rdv-list">
+          {filtered.map((booking) => (
+            <div className="rdv-row" key={booking.id}>
+              <span>{booking.patient}</span>
+              <span>{booking.service}</span>
+              <span>{booking.date}</span>
+              <span>{booking.price} MAD</span>
+              <span className={`status ${booking.statut}`}>{booking.label}</span>
+              <span>
+                <button className="small-btn" onClick={() => setSelected(booking)}>Gérer</button>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {showAdd && <AddRdv onAdd={handleAdd} onClose={() => setShowAdd(false)} />}
+      {selected && (
+        <ActionView
+          booking={selected}
+          onClose={() => setSelected(null)}
+          onDelete={handleDelete}
+          onModify={handleModify}
+        />
+      )}
+    </>
+  )
+}
+
+export default Bookings
