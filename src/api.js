@@ -1,6 +1,4 @@
-const BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  'http://myshophp.infinityfreeapp.com/salon-app/backend/api'
+const BASE_URL = 'https://myshophp.infinityfreeapp.com/salon-app/backend/api';
 
 export const api = {
   get: (endpoint) =>
@@ -24,4 +22,4 @@ export const api = {
     fetch(`${BASE_URL}/${endpoint}?id=${id}`, {
       method: 'DELETE',
     }).then((r) => r.json()),
-}
+};
