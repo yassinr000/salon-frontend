@@ -1,4 +1,4 @@
-const BASE_URL = 'https://myshophp.infinityfreeapp.com/salon-app/backend/api';
+const BASE_URL = 'https://salonbeauty.infinityfreeapp.com/salon-app/backend/api';
 
 export const api = {
   get: (endpoint) =>
