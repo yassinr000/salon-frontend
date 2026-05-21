@@ -1,4 +1,5 @@
-const BASE_URL = 'https://myshophp.infinityfreeapp.com/salon-app/backend/api';
+const BASE_URL = '/api';
+
 export const api = {
   get: (endpoint) =>
     fetch(`${BASE_URL}/${endpoint}`).then((r) => r.json()),
