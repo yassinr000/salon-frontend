@@ -1,4 +1,4 @@
-const BASE_URL = '/api';
+const BASE_URL = 'https://salon-backend-production-5139.up.railway.app/api';
 
 export const api = {
   get: (endpoint) =>
