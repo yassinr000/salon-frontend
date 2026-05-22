@@ -13,7 +13,8 @@ function getPageFromHash() {
 }
 
 function Homepage() {
-  const [activePage, setActivePage] = useState(getPageFromHash)
+  const [activePage, setActivePage]   = useState(getPageFromHash)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     const onHashChange = () => setActivePage(getPageFromHash())
@@ -24,11 +25,17 @@ function Homepage() {
   const nav = (page) => () => {
     window.location.hash = page
     setActivePage(page)
+    setSidebarOpen(false)
   }
 
   return (
     <div className="layout">
-      <nav className="sidebar">
+      {/* Mobile overlay backdrop */}
+      {sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <nav className={`sidebar${sidebarOpen ? ' open' : ''}`}>
         <img src={logo} alt="Salon logo" className="logo" />
         <p>FSR Beauty Salon</p>
 
@@ -50,6 +57,15 @@ function Homepage() {
       </nav>
 
       <main className="content">
+        {/* Hamburger — mobile only */}
+        <button
+          className="hamburger"
+          onClick={() => setSidebarOpen((o) => !o)}
+          aria-label="Menu"
+        >
+          <i className="fas fa-bars"></i>
+        </button>
+
         {activePage === 'dashboard' && <Dashboard />}
         {activePage === 'bookings'  && <Bookings />}
         {activePage === 'clients'   && <Clients />}
