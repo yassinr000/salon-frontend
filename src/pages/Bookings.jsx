@@ -10,11 +10,15 @@ function Bookings() {
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
   const [selected, setSelected] = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    api.get('bookings.php').then((data) =>
-      setBookings(data.map((b) => ({ ...b, label: LABELS[b.statut] })))
-    )
+    api.get('bookings.php')
+      .then((data) => {
+        if (!Array.isArray(data)) { setError(data.error || 'Erreur API'); return }
+        setBookings(data.map((b) => ({ ...b, label: LABELS[b.statut] })))
+      })
+      .catch((err) => setError(err.message))
   }, [])
 
   const handleAdd = async (newBooking) => {
@@ -40,10 +44,11 @@ function Bookings() {
     b.patient.toLowerCase().includes(search.toLowerCase())
   )
 
+  if (error) return <p style={{color:'red', padding:'2rem'}}>Erreur: {error}</p>
+
   return (
     <>
       <h1 className="bookings-title">Rendez-vous</h1>
-
       <div className="rdv-container">
         <div className="rdv-topbar">
           <input
@@ -54,7 +59,6 @@ function Bookings() {
           />
           <button onClick={() => setShowAdd(true)}>Ajouter un nouveau rendez-vous</button>
         </div>
-
         <div className="rdv-props">
           <span>PATIENT</span>
           <span>SERVICE</span>
@@ -63,7 +67,6 @@ function Bookings() {
           <span>STATUT</span>
           <span>ACTION</span>
         </div>
-
         <div className="rdv-list">
           {filtered.map((booking) => (
             <div className="rdv-row" key={booking.id}>
@@ -79,7 +82,6 @@ function Bookings() {
           ))}
         </div>
       </div>
-
       {showAdd && <AddRdv onAdd={handleAdd} onClose={() => setShowAdd(false)} />}
       {selected && (
         <ActionView

@@ -10,11 +10,15 @@ function Clients() {
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
   const [selected, setSelected] = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    api.get('clients.php').then((data) =>
-      setClients(data.map((c) => ({ ...c, label: LABELS[c.statut] })))
-    )
+    api.get('clients.php')
+      .then((data) => {
+        if (!Array.isArray(data)) { setError(data.error || 'Erreur API'); return }
+        setClients(data.map((c) => ({ ...c, label: LABELS[c.statut] })))
+      })
+      .catch((err) => setError(err.message))
   }, [])
 
   const handleAdd = async (newClient) => {
@@ -40,10 +44,11 @@ function Clients() {
     c.patient.toLowerCase().includes(search.toLowerCase())
   )
 
+  if (error) return <p style={{color:'red', padding:'2rem'}}>Erreur: {error}</p>
+
   return (
     <>
       <h1 className="clients-title">Clients</h1>
-
       <div className="clients-container">
         <div className="clients-topbar">
           <input
@@ -54,7 +59,6 @@ function Clients() {
           />
           <button onClick={() => setShowAdd(true)}>Ajouter un client</button>
         </div>
-
         <div className="clients-table">
           <span>Name</span>
           <span>Numéro</span>
@@ -63,7 +67,6 @@ function Clients() {
           <span>Statut</span>
           <span>Action</span>
         </div>
-
         <div className="rdv-list">
           {filtered.map((client) => (
             <div className="client-row" key={client.id}>
@@ -79,7 +82,6 @@ function Clients() {
           ))}
         </div>
       </div>
-
       {showAdd && <AddClient onAdd={handleAdd} onClose={() => setShowAdd(false)} />}
       {selected && (
         <ClientView

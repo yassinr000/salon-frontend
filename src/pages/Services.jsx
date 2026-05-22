@@ -8,9 +8,15 @@ function Services() {
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
   const [selected, setSelected] = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    api.get('services.php').then(setServices)
+    api.get('services.php')
+      .then((data) => {
+        if (!Array.isArray(data)) { setError(data.error || 'Erreur API'); return }
+        setServices(data)
+      })
+      .catch((err) => setError(err.message))
   }, [])
 
   const handleAdd = async (newService) => {
@@ -35,12 +41,13 @@ function Services() {
     s.nom.toLowerCase().includes(search.toLowerCase())
   )
 
+  if (error) return <p style={{color:'red', padding:'2rem'}}>Erreur: {error}</p>
+
   return (
     <>
       <div className="service-header">
         <h1>Services</h1>
       </div>
-
       <div className="service-container">
         <div className="container-header">
           <input
@@ -54,7 +61,6 @@ function Services() {
           </button>
         </div>
         <hr />
-
         <div className="service-span">
           <span>Service</span>
           <span>Prix</span>
@@ -62,7 +68,6 @@ function Services() {
           <span>Durée</span>
           <span>Action</span>
         </div>
-
         <div className="service-props">
           {filtered.map((service) => (
             <div className="service-row" key={service.id}>
@@ -77,7 +82,6 @@ function Services() {
           ))}
         </div>
       </div>
-
       {showAdd && <AddService onAdd={handleAdd} onClose={() => setShowAdd(false)} />}
       {selected && (
         <ManageService
