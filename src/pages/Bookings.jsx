@@ -22,22 +22,36 @@ function Bookings() {
   }, [])
 
   const handleAdd = async (newBooking) => {
-    const saved = await api.post('bookings.php', newBooking)
-    setBookings((prev) => [...prev, { ...saved, label: LABELS[saved.statut] }])
-    setShowAdd(false)
+    try {
+      const saved = await api.post('bookings.php', newBooking)
+      if (saved.error) { setError('Erreur lors de l\'ajout: ' + saved.error); return }
+      setBookings((prev) => [...prev, { ...saved, label: LABELS[saved.statut] }])
+      setShowAdd(false)
+    } catch (err) {
+      setError('Erreur lors de l\'ajout: ' + err.message)
+    }
   }
 
   const handleDelete = async (id) => {
-    await api.delete('bookings.php', id)
-    setBookings((prev) => prev.filter((b) => b.id !== id))
-    setSelected(null)
+    try {
+      await api.delete('bookings.php', id)
+      setBookings((prev) => prev.filter((b) => b.id !== id))
+      setSelected(null)
+    } catch (err) {
+      setError('Erreur lors de la suppression: ' + err.message)
+    }
   }
 
   const handleModify = async (modified) => {
-    await api.put('bookings.php', modified.id, modified)
-    const updated = { ...modified, label: LABELS[modified.statut] }
-    setBookings((prev) => prev.map((b) => (b.id === modified.id ? updated : b)))
-    setSelected(updated)
+    try {
+      const result = await api.put('bookings.php', modified.id, modified)
+      if (result.error) { setError('Erreur lors de la modification: ' + result.error); return }
+      const updated = { ...modified, label: LABELS[modified.statut] }
+      setBookings((prev) => prev.map((b) => (b.id === modified.id ? updated : b)))
+      setSelected(updated)
+    } catch (err) {
+      setError('Erreur lors de la modification: ' + err.message)
+    }
   }
 
   const filtered = bookings.filter((b) =>
