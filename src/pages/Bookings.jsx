@@ -59,10 +59,22 @@ function Bookings() {
     (b.patient || '').toLowerCase().includes(search.toLowerCase())
   )
 
-  if (error) return <p style={{ color: 'red', padding: '2rem' }}>Erreur: {error}</p>
-
   return (
     <>
+      {error && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px',
+          padding: '0.75rem 1.25rem', margin: '1rem 1.5rem 0',
+          color: '#b91c1c', fontSize: '0.9rem', gap: '1rem'
+        }}>
+          <span>⚠️ {error}</span>
+          <button onClick={() => setError(null)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: '#b91c1c', fontSize: '1.2rem', lineHeight: 1
+          }}>×</button>
+        </div>
+      )}
       <h1 className="bookings-title">Rendez-vous</h1>
       <div className="rdv-container">
         <div className="rdv-topbar">
