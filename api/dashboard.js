@@ -1,37 +1,71 @@
-import mysql from 'mysql2/promise';
+import React, { useState, useEffect } from 'react'
+import { api } from '../api.js'
 
-const db = () => mysql.createConnection({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  ssl: { rejectUnauthorized: false },
-});
+function Dashboard() {
+  const [stats, setStats] = useState(null)
+  const [error, setError] = useState(null)
+  const today = new Date().toLocaleDateString('fr-FR')
 
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  useEffect(() => {
+    api.get('dashboard.php')
+      .then(data => {
+        if (data.error) setError(data.error)
+        else setStats(data)
+      })
+      .catch(err => setError(err.message))
+  }, [])
 
-  const conn = await db();
+  if (error) return <p style={{color:'red', padding:'2rem'}}>Erreur: {error}</p>
+  if (!stats) return <p style={{padding:'2rem'}}>Chargement...</p>
 
-  try {
-    const [[{ total_bookings }]] = await conn.execute('SELECT COUNT(*) as total_bookings FROM bookings');
-    const [[{ total_clients }]] = await conn.execute('SELECT COUNT(*) as total_clients FROM clients');
-    const [[{ total_services }]] = await conn.execute('SELECT COUNT(*) as total_services FROM services');
-    const [[{ revenue }]] = await conn.execute("SELECT SUM(price) as revenue FROM bookings WHERE statut='confirme'");
+  const pct = (n) => (stats.total > 0 ? Math.round((n / stats.total) * 100) : 0)
 
-    res.status(200).json({
-      total_bookings,
-      total_clients,
-      total_services,
-      revenue: revenue || 0,
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  } finally {
-    await conn.end();
-  }
+  return (
+    <>
+      <h1 className="dashboard-title">Dashboard</h1>
+      <div className="cards">
+        <div className="today-rdv">
+          <h2>Rendez-vous pour aujourd'hui</h2>
+          <p>{stats.today_count ?? 0} rendez-vous</p>
+          <p>Pour {today}</p>
+        </div>
+        <div className="earnings">
+          <h2>Revenus totaux</h2>
+          <p>{(stats.today_revenue ?? 0).toFixed(2)} MAD</p>
+          <p>Pour {today}</p>
+        </div>
+        <div className="finished">
+          <h2>Terminés</h2>
+          <p>{stats.confirme ?? 0} RDV</p>
+          <p>{pct(stats.confirme ?? 0)}% du total</p>
+        </div>
+        <div className="on-hold">
+          <h2>En attente</h2>
+          <p>{stats['en-attente'] ?? 0} RDV</p>
+          <p>{pct(stats['en-attente'] ?? 0)}% du total</p>
+        </div>
+        <div className="canceled">
+          <h2>Annulés</h2>
+          <p>{stats.annule ?? 0} RDV</p>
+          <p>{pct(stats.annule ?? 0)}% du total</p>
+        </div>
+        <div className="reservations-chart">
+          <h2>Réservations par jour</h2>
+          <p>Évolution des réservations pour {today}</p>
+          <div className="chart-placeholder">
+            <div className="line line-reservations"></div>
+          </div>
+        </div>
+        <div className="earnings-chart">
+          <h2>Revenus par jour</h2>
+          <p>Évolution des revenus pour {today}</p>
+          <div className="chart-placeholder">
+            <div className="line line-earnings"></div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
 }
+
+export default Dashboard
