@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import AddRdv from '../components/AddRdv.jsx'
 import ActionView from '../components/ActionView.jsx'
 import { api } from '../api.js'
@@ -12,7 +12,7 @@ function Bookings() {
   const [selected, setSelected] = useState(null)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
+  const loadBookings = useCallback(() => {
     api.get('bookings.php')
       .then((data) => {
         if (!Array.isArray(data)) { setError(data.error || 'Erreur API'); return }
@@ -21,12 +21,14 @@ function Bookings() {
       .catch((err) => setError(err.message))
   }, [])
 
+  useEffect(() => { loadBookings() }, [loadBookings])
+
   const handleAdd = async (newBooking) => {
     try {
       const saved = await api.post('bookings.php', newBooking)
       if (saved.error) { setError('Erreur lors de l\'ajout: ' + saved.error); return }
-      setBookings((prev) => [...prev, { ...saved, label: LABELS[saved.statut] }])
       setShowAdd(false)
+      loadBookings()
     } catch (err) {
       setError('Erreur lors de l\'ajout: ' + err.message)
     }
@@ -35,8 +37,8 @@ function Bookings() {
   const handleDelete = async (id) => {
     try {
       await api.delete('bookings.php', id)
-      setBookings((prev) => prev.filter((b) => b.id !== id))
       setSelected(null)
+      loadBookings()
     } catch (err) {
       setError('Erreur lors de la suppression: ' + err.message)
     }
@@ -46,19 +48,18 @@ function Bookings() {
     try {
       const result = await api.put('bookings.php', modified.id, modified)
       if (result.error) { setError('Erreur lors de la modification: ' + result.error); return }
-      const updated = { ...modified, label: LABELS[modified.statut] }
-      setBookings((prev) => prev.map((b) => (b.id === modified.id ? updated : b)))
-      setSelected(updated)
+      setSelected(null)
+      loadBookings()
     } catch (err) {
       setError('Erreur lors de la modification: ' + err.message)
     }
   }
 
   const filtered = bookings.filter((b) =>
-    b.patient.toLowerCase().includes(search.toLowerCase())
+    (b.patient || '').toLowerCase().includes(search.toLowerCase())
   )
 
-  if (error) return <p style={{color:'red', padding:'2rem'}}>Erreur: {error}</p>
+  if (error) return <p style={{ color: 'red', padding: '2rem' }}>Erreur: {error}</p>
 
   return (
     <>
